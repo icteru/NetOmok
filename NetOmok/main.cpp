@@ -3,22 +3,9 @@
 #include <iostream>
 
 #include "common.h"
+#include "application.h"
 
 using namespace omok::logging;
-
-int init()
-{
-	// init SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_EVENTS) != 0)
-	{
-		logger.e("SDL_Init : %s", SDL_GetError());
-
-		return 1;
-	}
-
-
-	return 0;
-}
 
 int main(int argc, char** argv)
 {
@@ -34,17 +21,21 @@ int main(int argc, char** argv)
 	}
 
 	// program start
-	logger.i("program start");
+	bool exit = false;
+	omok::ApplicationSP app = std::make_shared<omok::Application>();
 
-	init();
+	if (!app->init())
+	{
+		exit = true;
+	}
 
-	logger.i("program init complete");
+	// program running
+	if(!exit)
+		app->run();
 
+	// program terminating
 
-
-
-
-	logger.i("program terminated");
+	app->clean();
 
 	// close logfile
 	if (logger.has(logfile))
